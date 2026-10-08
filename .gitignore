@@ -1,0 +1,15 @@
+## Build and output
+[Bb]in/
+[Oo]bj/
+publish/
+
+## Visual Studio & IDEs
+.vs/
+*.user
+*.suo
+.idea/
+
+## OS generated files
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store

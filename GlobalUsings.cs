@@ -1,0 +1,10 @@
+global using Application = System.Windows.Application;
+global using MessageBox = System.Windows.MessageBox;
+global using Point = System.Windows.Point;
+global using Size = System.Windows.Size;
+global using Color = System.Windows.Media.Color;
+global using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+global using DragEventArgs = System.Windows.DragEventArgs;
+global using DataFormats = System.Windows.DataFormats;
+global using DragDropEffects = System.Windows.DragDropEffects;
+global using OpenFileDialog = Microsoft.Win32.OpenFileDialog;

@@ -1,0 +1,656 @@
+<Window x:Class="TenXBar.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TenXBar"
+        mc:Ignorable="d"
+        Title="10xbar - Windows Taskbar Folders &amp; Organizer"
+        Icon="Resources/app.ico"
+        Height="680" Width="960"
+        MinHeight="580" MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#13141B"
+        Foreground="#E5E7EB"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <!-- Modern ScrollViewer style -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Width" Value="8"/>
+        </Style>
+
+        <!-- Primary Button Style -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#3B82F6"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#2563EB"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Secondary Button Style -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#252837"/>
+            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#3B4058"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#30344A"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#4F5677"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#212432"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Danger Button Style -->
+        <Style x:Key="DangerButton" TargetType="Button">
+            <Setter Property="Background" Value="#3B1E2B"/>
+            <Setter Property="Foreground" Value="#F87171"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#6B283A"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#5C2538"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Dark TextBox Style -->
+        <Style x:Key="DarkTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#1C1E2A"/>
+            <Setter Property="Foreground" Value="#F9FAFB"/>
+            <Setter Property="BorderBrush" Value="#383D55"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Dark ComboBox Toggle Button Template -->
+        <ControlTemplate x:Key="DarkComboBoxToggleButtonTemplate" TargetType="ToggleButton">
+            <Border x:Name="templateRoot"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="6">
+                <Border Width="24"
+                        HorizontalAlignment="Right"
+                        Margin="0,0,4,0"
+                        BorderThickness="0">
+                    <Path x:Name="arrow"
+                          Data="M 0 0 L 4 4 L 8 0 Z"
+                          Fill="#9CA3AF"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+                </Border>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="templateRoot" Property="BorderBrush" Value="#4F5677"/>
+                    <Setter TargetName="templateRoot" Property="Background" Value="#252838"/>
+                    <Setter TargetName="arrow" Property="Fill" Value="#FFFFFF"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="templateRoot" Property="BorderBrush" Value="#3B82F6"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Dark ComboBoxItem Style -->
+        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#1C1E2A"/>
+            <Setter Property="Foreground" Value="#F3F4F6"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="bd"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                Margin="2,1"
+                                CornerRadius="4">
+                            <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}"
+                                              TextElement.FontFamily="Segoe UI"
+                                              TextElement.FontSize="13"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#2E3348"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#3B82F6"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Dark ComboBox Style -->
+        <Style x:Key="DarkComboBox" TargetType="ComboBox">
+            <Setter Property="Background" Value="#1C1E2A"/>
+            <Setter Property="Foreground" Value="#F3F4F6"/>
+            <Setter Property="BorderBrush" Value="#383D55"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid x:Name="templateRoot">
+                            <ToggleButton x:Name="toggleButton"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          ClickMode="Press"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Template="{StaticResource DarkComboBoxToggleButtonTemplate}"/>
+                            <ContentPresenter x:Name="contentPresenter"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                              HorizontalAlignment="Left"
+                                              IsHitTestVisible="False"
+                                              Margin="10,7,28,7"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="#F3F4F6"
+                                              TextElement.FontFamily="Segoe UI"
+                                              TextElement.FontSize="13"/>
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Placement="Bottom"
+                                   PopupAnimation="Slide">
+                                <Border x:Name="dropDownBorder"
+                                        Background="#1C1E2A"
+                                        BorderBrush="#383D55"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Margin="0,2,0,0"
+                                        MinWidth="{Binding ActualWidth, ElementName=templateRoot}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ScrollViewer x:Name="DropDownScrollViewer" Margin="2">
+                                        <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="toggleButton" Property="BorderBrush" Value="#4F5677"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="toggleButton" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top Header Bar -->
+            <RowDefinition Height="64"/>
+            <!-- Main Content Area -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Header Bar -->
+        <Border Grid.Row="0" Background="#181924" BorderBrush="#262A3C" BorderThickness="0,0,0,1" Padding="24,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- App Brand -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="Resources/app_icon.png" Width="36" Height="36" Margin="0,0,12,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="10xbar" FontSize="17" FontWeight="Bold" Foreground="#FFFFFF" FontFamily="Segoe UI Variable Display, Segoe UI"/>
+                            <Border Background="#2563EB" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="Windows Taskbar Folders &amp; Decluttering Suite" FontSize="11.5" Foreground="#9CA3AF" FontFamily="Segoe UI"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Quick Action Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <CheckBox x:Name="AutoStartCheckBox"
+                              Content="Start with Windows"
+                              Foreground="#9CA3AF"
+                              FontFamily="Segoe UI"
+                              FontSize="12"
+                              VerticalAlignment="Center"
+                              Margin="0,0,16,0"
+                              Cursor="Hand"
+                              Checked="AutoStartCheckBox_Checked"
+                              Unchecked="AutoStartCheckBox_Unchecked"
+                              ToolTip="Automatically start 10xbar quietly in background when Windows boots"/>
+                    <Button Content="📂 Shortcuts Folder"
+                            Style="{StaticResource SecondaryButton}"
+                            Margin="0,0,10,0"
+                            Click="OpenShortcutsFolder_Click"
+                            ToolTip="Open folder containing all created taskbar shortcuts"/>
+                    <Button Content="⚡ Add New Group"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="NewGroup_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Body Grid: Sidebar + Details -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <!-- Sidebar (Groups) -->
+                <ColumnDefinition Width="280"/>
+                <!-- Divider -->
+                <ColumnDefinition Width="1"/>
+                <!-- Details Panel -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Sidebar -->
+            <Border Grid.Column="0" Background="#161722" Padding="14,16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="YOUR FOLDERS" FontSize="11" FontWeight="Bold" Foreground="#6B7280" Margin="4,0,0,10"/>
+
+                    <!-- Groups List -->
+                    <ListBox Grid.Row="1"
+                             x:Name="GroupsListBox"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             SelectionChanged="GroupsListBox_SelectionChanged"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Margin" Value="0,2"/>
+                                <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="itemBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="itemBorder" Property="Background" Value="#222534"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="itemBorder" Property="Background" Value="#2D3248"/>
+                                                    <Setter TargetName="itemBorder" Property="BorderBrush" Value="#3B82F6"/>
+                                                    <Setter TargetName="itemBorder" Property="BorderThickness" Value="1"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Group Icon -->
+                                    <Border Grid.Column="0" Width="30" Height="30" CornerRadius="6" Background="#262A3C" Margin="0,0,10,0">
+                                        <Image Source="{Binding IconPath}" Width="22" Height="22" Stretch="Uniform"/>
+                                    </Border>
+                                    <!-- Name & Count -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" Foreground="#F3F4F6"/>
+                                        <TextBlock Text="{Binding ItemCountText}" FontSize="11" Foreground="#9CA3AF"/>
+                                    </StackPanel>
+                                    <!-- Chevron -->
+                                    <TextBlock Grid.Column="2" Text="›" FontSize="18" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Sidebar Footer -->
+                    <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                        <Button Content="🗑 Delete Selected Folder"
+                                Style="{StaticResource DangerButton}"
+                                HorizontalAlignment="Stretch"
+                                Click="DeleteGroup_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Vertical Divider -->
+            <Rectangle Grid.Column="1" Fill="#262A3C"/>
+
+            <!-- Right Details View -->
+            <Grid Grid.Column="2" Margin="24,18,24,20" x:Name="DetailsContainer">
+                <Grid.RowDefinitions>
+                    <!-- Folder Configuration Card -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Items Section -->
+                    <RowDefinition Height="*"/>
+                    <!-- Action Bar (Test & Pin) -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Folder Settings Card -->
+                <Border Grid.Row="0" Background="#1A1C28" CornerRadius="10" BorderBrush="#2D3249" BorderThickness="1" Padding="18,16" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Folder Name -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,14,0">
+                            <TextBlock Text="Folder Name" FontSize="12" FontWeight="SemiBold" Foreground="#9CA3AF" Margin="0,0,0,6"/>
+                            <TextBox x:Name="GroupNameTextBox"
+                                     Style="{StaticResource DarkTextBox}"
+                                     TextChanged="GroupNameTextBox_TextChanged"/>
+                        </StackPanel>
+
+                        <!-- Columns Selector -->
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,14,0">
+                            <TextBlock Text="Flyout Columns" FontSize="12" FontWeight="SemiBold" Foreground="#9CA3AF" Margin="0,0,0,6"/>
+                            <ComboBox x:Name="ColumnsComboBox"
+                                      Style="{StaticResource DarkComboBox}"
+                                      SelectionChanged="ColumnsComboBox_SelectionChanged">
+                                <ComboBoxItem Content="2 Columns"/>
+                                <ComboBoxItem Content="3 Columns"/>
+                                <ComboBoxItem Content="4 Columns"/>
+                                <ComboBoxItem Content="5 Columns"/>
+                                <ComboBoxItem Content="6 Columns"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Color Preset -->
+                        <StackPanel Grid.Row="0" Grid.Column="2">
+                            <TextBlock Text="Theme Color" FontSize="12" FontWeight="SemiBold" Foreground="#9CA3AF" Margin="0,0,0,6"/>
+                            <ComboBox x:Name="AccentColorComboBox"
+                                      Style="{StaticResource DarkComboBox}"
+                                      SelectionChanged="AccentColorComboBox_SelectionChanged">
+                                <ComboBoxItem Content="Blue (#3B82F6)"/>
+                                <ComboBoxItem Content="Emerald (#10B981)"/>
+                                <ComboBoxItem Content="Purple (#8B5CF6)"/>
+                                <ComboBoxItem Content="Amber (#F59E0B)"/>
+                                <ComboBoxItem Content="Rose (#EC4899)"/>
+                                <ComboBoxItem Content="Cyan (#06B6D4)"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Folder Icon Setting (Row 1) -->
+                        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#141622" CornerRadius="8" Padding="12,10" Margin="0,14,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Current Icon Preview -->
+                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="8" Background="#262A3C" Margin="0,0,12,0" VerticalAlignment="Center">
+                                    <Image x:Name="SelectedFolderIconPreview" Width="26" Height="26" Stretch="Uniform"/>
+                                </Border>
+
+                                <!-- Info Label -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Folder Taskbar Icon" FontWeight="SemiBold" FontSize="12.5" Foreground="#F3F4F6"/>
+                                    <TextBlock x:Name="IconStatusText" Text="Set custom icon from system (.ico, .png, .exe, .dll)" FontSize="11" Foreground="#9CA3AF"/>
+                                </StackPanel>
+
+                                <!-- Buttons -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="🔄 Reset"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Margin="0,0,8,0"
+                                            Padding="10,6"
+                                            Click="ResetFolderIcon_Click"
+                                            ToolTip="Reset to automatically generated letter icon"/>
+                                    <Button Content="🖼 Change Icon (System)..."
+                                            Style="{StaticResource PrimaryButton}"
+                                            Padding="12,6"
+                                            Click="ChangeFolderIcon_Click"
+                                            ToolTip="Select any .ico, .png, .exe, or .dll icon from your computer"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Apps Section -->
+                <Grid Grid.Row="1" Margin="0,0,0,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Apps Header & Quick Add Toolbar -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Applications in this Folder" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                            <TextBlock x:Name="ItemsCountLabel" Text=" (4)" FontSize="13" Foreground="#9CA3AF" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="⚡ Quick Add Common"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,8,0"
+                                    Click="QuickAddCommon_Click"/>
+                            <Button Content="+ Add Application..."
+                                    Style="{StaticResource PrimaryButton}"
+                                    Click="AddApp_Click"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Drag & Drop Items List -->
+                    <Border Grid.Row="1" Background="#181A26" CornerRadius="10" BorderBrush="#2B3045" BorderThickness="1"
+                            AllowDrop="True"
+                            DragOver="ItemsList_DragOver"
+                            Drop="ItemsList_Drop">
+                        <Grid>
+                            <!-- Empty State Hint (visible if empty) -->
+                            <StackPanel x:Name="EmptyStatePanel" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+                                <TextBlock Text="📥" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <TextBlock Text="This folder is empty" FontSize="15" FontWeight="SemiBold" Foreground="#D1D5DB" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Click '+ Add Application' or drag and drop any .exe / .lnk shortcuts here"
+                                           FontSize="12" Foreground="#818898" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+
+                            <!-- Items List -->
+                            <ListBox x:Name="AppsListBox"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="8">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Background" Value="#202332"/>
+                                        <Setter Property="Margin" Value="0,3"/>
+                                        <Setter Property="Padding" Value="10,8"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="b" Property="Background" Value="#292D3E"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="b" Property="Background" Value="#30354A"/>
+                                                            <Setter TargetName="b" Property="BorderBrush" Value="#3B82F6"/>
+                                                            <Setter TargetName="b" Property="BorderThickness" Value="1"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- App Icon -->
+                                            <Border Grid.Column="0" Width="36" Height="36" CornerRadius="6" Background="#282C40" Margin="0,0,12,0">
+                                                <Image Source="{Binding IconPath}" Width="28" Height="28" Stretch="Uniform"/>
+                                            </Border>
+
+                                            <!-- App Details -->
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13.5" Foreground="#F9FAFB"/>
+                                                <TextBlock Text="{Binding TargetPath}" FontSize="11" Foreground="#8890A2" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+
+                                            <!-- Actions: Up, Down, Delete -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Content="▲" ToolTip="Move Up" Click="MoveUpItem_Click" Tag="{Binding}" Style="{StaticResource SecondaryButton}" Padding="8,4" Margin="0,0,4,0"/>
+                                                <Button Content="▼" ToolTip="Move Down" Click="MoveDownItem_Click" Tag="{Binding}" Style="{StaticResource SecondaryButton}" Padding="8,4" Margin="0,0,6,0"/>
+                                                <Button Content="✕" ToolTip="Remove" Click="DeleteItem_Click" Tag="{Binding}" Style="{StaticResource DangerButton}" Padding="8,4"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Bottom Action Bar (Test & Pin) -->
+                <Border Grid.Row="2" Background="#181A25" CornerRadius="10" BorderBrush="#2D3249" BorderThickness="1" Padding="16,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Tip Info -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="💡 Tip: Drag and drop files from desktop directly into the list above."
+                                       FontSize="12" Foreground="#9CA3AF"/>
+                            <TextBlock Text="Click 'Pin to Taskbar' to generate shortcut and pin it directly."
+                                       FontSize="11.5" Foreground="#6B7280" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <!-- Buttons -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="🚀 Test Flyout Now"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Margin="0,0,10,0"
+                                    Click="TestFlyout_Click"
+                                    ToolTip="Preview the flyout popup right now"/>
+                            <Button Content="📌 Pin to Taskbar"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Click="PinToTaskbar_Click"
+                                    ToolTip="Create high-res taskbar shortcut and pin to taskbar"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
