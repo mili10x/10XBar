@@ -107,6 +107,41 @@
             </Setter>
         </Style>
 
+        <!-- Preset Icon Button Style -->
+        <Style x:Key="PresetIconButton" TargetType="Button">
+            <Setter Property="Background" Value="#1C1E2B"/>
+            <Setter Property="BorderBrush" Value="#2D3248"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Width" Value="44"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Padding" Value="3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#282D42"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#60A5FA"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#1E2336"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Dark TextBox Style -->
         <Style x:Key="DarkTextBox" TargetType="TextBox">
             <Setter Property="Background" Value="#1C1E2A"/>
@@ -472,41 +507,82 @@
                             </ComboBox>
                         </StackPanel>
 
-                        <!-- Folder Icon Setting (Row 1) -->
-                        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#141622" CornerRadius="8" Padding="12,10" Margin="0,14,0,0">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                        <!-- Folder Icon Setting & 10X Presets (Row 1) -->
+                        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="#141622" BorderBrush="#252837" BorderThickness="1" CornerRadius="8" Padding="12,12" Margin="0,14,0,0">
+                            <StackPanel>
+                                <!-- Top: Current Icon Preview & Custom File Actions -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Current Icon Preview -->
-                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="8" Background="#262A3C" Margin="0,0,12,0" VerticalAlignment="Center">
-                                    <Image x:Name="SelectedFolderIconPreview" Width="26" Height="26" Stretch="Uniform"/>
-                                </Border>
+                                    <!-- Current Icon Preview -->
+                                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8" Background="#1E2230" BorderBrush="#3B82F6" BorderThickness="1.5" Margin="0,0,12,0" VerticalAlignment="Center">
+                                        <Image x:Name="SelectedFolderIconPreview" Width="30" Height="30" Stretch="Uniform"/>
+                                    </Border>
 
-                                <!-- Info Label -->
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Folder Taskbar Icon" FontWeight="SemiBold" FontSize="12.5" Foreground="#F3F4F6"/>
-                                    <TextBlock x:Name="IconStatusText" Text="Set custom icon from system (.ico, .png, .exe, .dll)" FontSize="11" Foreground="#9CA3AF"/>
-                                </StackPanel>
+                                    <!-- Info Label -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Folder Taskbar Icon" FontWeight="SemiBold" FontSize="13" Foreground="#F3F4F6"/>
+                                        <TextBlock x:Name="IconStatusText" Text="Select a 10X preset below or upload from PC" FontSize="11" Foreground="#9CA3AF"/>
+                                    </StackPanel>
 
-                                <!-- Buttons -->
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button Content="🔄 Reset"
-                                            Style="{StaticResource SecondaryButton}"
-                                            Margin="0,0,8,0"
-                                            Padding="10,6"
-                                            Click="ResetFolderIcon_Click"
-                                            ToolTip="Reset to automatically generated letter icon"/>
-                                    <Button Content="🖼 Change Icon (System)..."
-                                            Style="{StaticResource PrimaryButton}"
-                                            Padding="12,6"
-                                            Click="ChangeFolderIcon_Click"
-                                            ToolTip="Select any .ico, .png, .exe, or .dll icon from your computer"/>
-                                </StackPanel>
-                            </Grid>
+                                    <!-- Buttons -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="🔄 Reset"
+                                                Style="{StaticResource SecondaryButton}"
+                                                Margin="0,0,8,0"
+                                                Padding="10,6"
+                                                Click="ResetFolderIcon_Click"
+                                                ToolTip="Reset to automatically generated letter icon"/>
+                                        <Button Content="📁 Custom Icon (PC)..."
+                                                Style="{StaticResource SecondaryButton}"
+                                                Padding="12,6"
+                                                Click="ChangeFolderIcon_Click"
+                                                ToolTip="Select any .ico, .png, .exe, or .dll icon from your computer"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Divider -->
+                                <Rectangle Height="1" Fill="#232636" Margin="0,10,0,10"/>
+
+                                <!-- 10X Presets Shelf -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                                        <TextBlock Text="⚡ 10X Presets" FontWeight="Bold" FontSize="11.5" Foreground="#60A5FA"/>
+                                        <TextBlock Text="1-Click Apply" FontSize="10" Foreground="#6B7280"/>
+                                    </StackPanel>
+
+                                    <!-- Horizontal Scroll / ItemsControl for the 10 Presets -->
+                                    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                        <ItemsControl x:Name="PresetIconsList">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource PresetIconButton}"
+                                                            Tag="{Binding}"
+                                                            Click="PresetIconButton_Click"
+                                                            ToolTip="{Binding ToolTip}"
+                                                            Margin="0,0,8,0">
+                                                        <Image Source="{Binding PngPath}" Width="32" Height="32" Stretch="Uniform" IsHitTestVisible="False"/>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </StackPanel>
                         </Border>
                     </Grid>
                 </Border>

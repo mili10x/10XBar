@@ -39,15 +39,31 @@ public partial class MainWindow : Window
 
         LoadGroups();
         AutoStartCheckBox.IsChecked = StartupService.IsStartupEnabled();
+        PresetIconsList.ItemsSource = IconExtractorService.GetPresetIcons();
     }
 
     private void LoadGroups()
     {
         _groups.Clear();
         var loaded = _storage.LoadGroups();
+        bool hasChanges = false;
         foreach (var g in loaded)
         {
+            foreach (var item in g.Items)
+            {
+                string cleaned = SanitizeAppName(item.Name);
+                if (cleaned != item.Name)
+                {
+                    item.Name = cleaned;
+                    hasChanges = true;
+                }
+            }
             _groups.Add(g);
+        }
+
+        if (hasChanges)
+        {
+            _storage.SaveGroups(_groups.ToList());
         }
 
         GroupsListBox.ItemsSource = _groups;
@@ -104,11 +120,13 @@ public partial class MainWindow : Window
         {
             try
             {
+                using var stream = new FileStream(_selectedGroup.IconPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 var bmp = new BitmapImage();
                 bmp.BeginInit();
-                bmp.UriSource = new Uri(_selectedGroup.IconPath);
                 bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.StreamSource = stream;
                 bmp.EndInit();
+                bmp.Freeze();
                 SelectedFolderIconPreview.Source = bmp;
             }
             catch
@@ -122,7 +140,7 @@ public partial class MainWindow : Window
         }
 
         IconStatusText.Text = _selectedGroup.HasCustomIcon
-            ? "Custom icon selected from system"
+            ? "10X custom/preset icon active"
             : "Default generated folder icon";
     }
 
@@ -202,6 +220,14 @@ public partial class MainWindow : Window
 
                 UpdateFolderIconPreview();
 
+                try
+                {
+                    int sel = GroupsListBox.SelectedIndex;
+                    GroupsListBox.Items.Refresh();
+                    GroupsListBox.SelectedIndex = sel;
+                }
+                catch { }
+
                 // Update shortcut if present
                 string exePath = Process.GetCurrentProcess().MainModule?.FileName ??
                                  Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TenXBar.exe");
@@ -212,6 +238,12 @@ public partial class MainWindow : Window
 
     private void ResetFolderIcon_Click(object sender, RoutedEventArgs e)
     {
+        _selectedGroup ??= GroupsListBox.SelectedItem as FolderGroup;
+        if (_selectedGroup == null && _groups.Count > 0)
+        {
+            _selectedGroup = _groups[0];
+            GroupsListBox.SelectedItem = _selectedGroup;
+        }
         if (_selectedGroup == null) return;
 
         _selectedGroup.HasCustomIcon = false;
@@ -221,10 +253,60 @@ public partial class MainWindow : Window
 
         UpdateFolderIconPreview();
 
+        try
+        {
+            int sel = GroupsListBox.SelectedIndex;
+            GroupsListBox.Items.Refresh();
+            GroupsListBox.SelectedIndex = sel;
+        }
+        catch { }
+
         // Update shortcut if present
         string exePath = Process.GetCurrentProcess().MainModule?.FileName ??
                          Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TenXBar.exe");
         ShortcutService.CreateOrUpdateGroupShortcut(_selectedGroup, exePath);
+    }
+
+    private void PresetIconButton_Click(object sender, RoutedEventArgs e)
+    {
+        _selectedGroup ??= GroupsListBox.SelectedItem as FolderGroup;
+        if (_selectedGroup == null && _groups.Count > 0)
+        {
+            _selectedGroup = _groups[0];
+            GroupsListBox.SelectedItem = _selectedGroup;
+        }
+        if (_selectedGroup == null) return;
+
+        PresetIconItem? preset = null;
+        if (sender is System.Windows.Controls.Button btn)
+        {
+            preset = (btn.Tag as PresetIconItem) ?? (btn.DataContext as PresetIconItem);
+        }
+
+        if (preset == null) return;
+
+        var (pngPath, icoPath) = IconExtractorService.SetPresetGroupIcon(_selectedGroup.Id, preset.PngPath, preset.IcoPath);
+        if (!string.IsNullOrEmpty(pngPath) && File.Exists(pngPath))
+        {
+            _selectedGroup.IconPath = pngPath;
+            _selectedGroup.HasCustomIcon = true;
+            _storage.SaveGroups(_groups.ToList());
+
+            UpdateFolderIconPreview();
+
+            try
+            {
+                int sel = GroupsListBox.SelectedIndex;
+                GroupsListBox.Items.Refresh();
+                GroupsListBox.SelectedIndex = sel;
+            }
+            catch { }
+
+            // Update shortcut if present
+            string exePath = Process.GetCurrentProcess().MainModule?.FileName ??
+                             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TenXBar.exe");
+            ShortcutService.CreateOrUpdateGroupShortcut(_selectedGroup, exePath);
+        }
     }
 
     private void NewGroup_Click(object sender, RoutedEventArgs e)
@@ -329,11 +411,40 @@ public partial class MainWindow : Window
         cm.IsOpen = true;
     }
 
+    public static string SanitizeAppName(string rawName)
+    {
+        if (string.IsNullOrWhiteSpace(rawName)) return "App";
+
+        string name = rawName.Trim();
+
+        // Strip trailing extensions (.lnk, .url, .exe, .bat, etc.)
+        while (name.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ||
+               name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ||
+               name.EndsWith(".url", StringComparison.OrdinalIgnoreCase) ||
+               name.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
+               name.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+        {
+            name = Path.GetFileNameWithoutExtension(name).Trim();
+        }
+
+        // Regex pattern to strip shortcut suffixes in various languages:
+        // " - Shortcut", " - میانبر", " - شورتکات", " - shortcut", " - Verknüpfung", " - Raccourci", " - Acceso directo", etc.
+        // Handles hyphens, en-dashes, em-dashes, and trailing duplicate numbers like " - Shortcut (2)" or " - میانبر (1)"
+        string pattern = @"\s*[-–—]\s*(Shortcut|میانبر|شورتکات|shortcut|Verknüpfung|Raccourci|Acceso directo|Atalho|Collegamento|Ярлык)(\s*\(\d+\))?$";
+        name = System.Text.RegularExpressions.Regex.Replace(name, pattern, "", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+
+        // Also handle cases without dash if formatted like "Telegram میانبر" or "App Shortcut"
+        name = System.Text.RegularExpressions.Regex.Replace(name, @"\s+(میانبر|شورتکات|Shortcut)$", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+
+        return string.IsNullOrWhiteSpace(name) ? rawName : name;
+    }
+
     private void AddFileToSelectedGroup(string filePath, string? customName = null)
     {
         if (_selectedGroup == null) return;
 
-        string name = customName ?? Path.GetFileNameWithoutExtension(filePath);
+        string rawName = customName ?? Path.GetFileNameWithoutExtension(filePath);
+        string name = SanitizeAppName(rawName);
         string id = Guid.NewGuid().ToString("N");
         string iconPath = IconExtractorService.ExtractAndCacheIcon(filePath, id);
 
@@ -432,11 +543,12 @@ public partial class MainWindow : Window
             ShortcutService.RevealInExplorer(shortcutPath);
 
             MessageBox.Show(
-                $"✅ Taskbar Shortcut created for '{_selectedGroup.Name}'!\n\n" +
-                $"File Explorer has opened with the shortcut selected.\n" +
-                $"Simply Right-Click on '{Path.GetFileName(shortcutPath)}' and select 'Pin to taskbar'.\n\n" +
-                $"Whenever you click that icon in your taskbar, your 10xbar folder flyout will open!",
-                "10xbar - Ready to Pin",
+                $"✅ شورت‌کات رسمی پوشه «{_selectedGroup.Name}» با آیکون اختصاصی ۱۰X ساخته شد!\n\n" +
+                $"پنجره شورت‌کات‌ها باز شده و فایل «{Path.GetFileName(shortcutPath)}» در حالت انتخاب است.\n\n" +
+                $"کافیست روی فایل انتخاب‌شده راست‌کلیک کرده و گزینه زیر را بزنید:\n" +
+                $"👉 «Pin to taskbar» (پین کردن به نوار وظیفه)\n\n" +
+                $"پس از آن، آیکون پوشه مستقیماً روی تسک‌بار شما قرار می‌گیرد و با کلیک روی آن، درست مثل «Test Flyout» پنجره برنامه‌ها باز می‌شود.",
+                "10XBar - آماده پین به تسک‌بار",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information
             );
