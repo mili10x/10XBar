@@ -88,14 +88,17 @@ public class TenXBarTests
     [Fact]
     public void ShortcutService_GeneratesShortcutsForAllLoadedGroups()
     {
-        var storage = new StorageService();
-        var groups = storage.LoadGroups();
+        var testGroup1 = new FolderGroup("TestBatch1", "#10B981", 4);
+        var testGroup2 = new FolderGroup("TestBatch2", "#3B82F6", 4);
         string dummyExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TenXBar.exe");
 
-        foreach (var group in groups)
-        {
-            string path = ShortcutService.CreateOrUpdateGroupShortcut(group, dummyExe);
-            Assert.True(File.Exists(path), $"Shortcut should exist for {group.Name}");
-        }
+        string path1 = ShortcutService.CreateOrUpdateGroupShortcut(testGroup1, dummyExe);
+        string path2 = ShortcutService.CreateOrUpdateGroupShortcut(testGroup2, dummyExe);
+
+        Assert.True(File.Exists(path1), $"Shortcut should exist for {testGroup1.Name}");
+        Assert.True(File.Exists(path2), $"Shortcut should exist for {testGroup2.Name}");
+
+        try { if (File.Exists(path1)) File.Delete(path1); } catch { }
+        try { if (File.Exists(path2)) File.Delete(path2); } catch { }
     }
 }

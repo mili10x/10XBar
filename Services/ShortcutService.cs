@@ -13,10 +13,33 @@ public static class ShortcutService
     private const uint SHCNE_ASSOCCHANGED = 0x08000000;
     private const uint SHCNF_FLUSH = 0x1000;
 
+    public static string ResolveCanonicalExePath(string? requestedPath = null)
+    {
+        if (!string.IsNullOrEmpty(requestedPath) && File.Exists(requestedPath) && !requestedPath.Contains(@"\Tests\"))
+        {
+            return requestedPath;
+        }
+
+        string installedExe = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Programs", "10xbar", "TenXBar.exe");
+
+        if (File.Exists(installedExe))
+        {
+            return installedExe;
+        }
+
+        if (!string.IsNullOrEmpty(requestedPath))
+            return requestedPath;
+
+        return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TenXBar.exe");
+    }
+
     public static string CreateOrUpdateGroupShortcut(FolderGroup group, string exePath)
     {
         try
         {
+            exePath = ResolveCanonicalExePath(exePath);
             string shortcutsDir = StorageService.ShortcutsDirectory;
             if (!Directory.Exists(shortcutsDir))
                 Directory.CreateDirectory(shortcutsDir);
